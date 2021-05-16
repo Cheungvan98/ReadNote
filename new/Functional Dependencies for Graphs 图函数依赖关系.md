@@ -50,7 +50,7 @@
 
 1. 常见图标的标签表示：
 
-   ![1](/home/zhang/桌面/new/photos/1.png)
+   ![1](Functional Dependencies for Graphs 图函数依赖关系.assets/1.png)
 
 2. 图G = (V, E, L, FA)中，V表示有限的节点集合；E表示有限的边集合；L表示节点和边的标签可分为L(v)和L(e)；FA(v)表示节点的属性与属性值的对应关系；
 
@@ -64,7 +64,111 @@
 
    GFD ϕ指定了两个约束条件：1、由模式Q施加的拓扑约束。2、由X → Y指定的属性依赖。 即GFD既要被Q约束也要被函数依赖约束，Q规定了GFD的范围，使得依赖关系X → Y只施加在由Q标识的每个子图中的顶点的属性上
 
-3. 举例说明：![4](/home/zhang/桌面/new/photos/4.png)
+3. 举例说明：![4](Functional Dependencies for Graphs 图函数依赖关系.assets/4.png)
 
-   例1![](/home/zhang/桌面/new/photos/5.png) 其中X1是x1.val ,Y1是X2.val=y2.val 和x3.val=y3.val组成，如图Q1：x1是flight id ,x2是出发的city，x3是航班到达的城市。同理y1,y2，y3, y4，y5也都是如此，因此实体集
+   例1![](Functional Dependencies for Graphs 图函数依赖关系.assets/7.png)
+
+![](Functional Dependencies for Graphs 图函数依赖关系.assets/8.png)
+
+## 推论
+
+2、关于GFDS的推理
+GFDs的可满足性问题
+定理1：GFDs的可满足性问题是coNP-complete的
+
+推论2: 定义于有向无环图的常数GFDs，其可满足性问题是coNP-complete的
+
+引理3：当且仅当Σ不冲突时，GFDs集Σ是可满足的。
+
+推论4:如果满足下列条件之一，GFDs的集合Σ总是可满足的:
+
+1、Σ仅由变量GFDs组成
+
+2、Σ不包含形式为![](Functional Dependencies for Graphs 图函数依赖关系.assets/9.png)的GFDs
+
+GFDs的蕴含问题
+定理5、GFDs的蕴含问题是NP-complete的
+
+推论6、当所有的GFDs都被定义为DAG模式，并且它们都没有形式时，仅对于常数GFDs和变量CFDs，蕴含问题是NP-complete。
+
+引理7、对于![](Functional Dependencies for Graphs 图函数依赖关系.assets/10.png)和一个GFDs集合Σ，有Σ|=ϕ，当且仅当Y可以从Σ和X中扣除.
+
+推论8、用树结构模式定义的GFDs的蕴含问题是PTIME的
+
+## 不一致性检测
+
+命题9、GFDs的验证问题是coNP-complete。
+
+定理10、存在并行可测量的算法，给一个GFDs集合Σ和一个复制到n个处理器的图G，在<img src="Functional Dependencies for Graphs 图函数依赖关系.assets/11.png" style="zoom:33%;" />  <img src="Functional Dependencies for Graphs 图函数依赖关系.assets/14.png" style="zoom: 33%;" /> 并行时间内计算Vio(Σ,G)
+
+定理11、存在并行可测量的算法，给定一个GFDs集合Σ，一个分好了的图G和n个处理器在并行时间内。Vio(Σ, G)在<img src="Functional Dependencies for Graphs 图函数依赖关系.assets/12.png" style="zoom:50%;" />   <img src="Functional Dependencies for Graphs 图函数依赖关系.assets/13.png" style="zoom:50%;" /> 
+
+ 若<img src="Functional Dependencies for Graphs 图函数依赖关系.assets/15.png" style="zoom:50%;" /> 则我们说h(x)违反了C，其中GFD<img src="Functional Dependencies for Graphs 图函数依赖关系.assets/16.png" style="zoom:50%;" /> 是G根据图模式Q使用h(x)匹配到的一个子图。我们将所有违反的h(x)添加到一个违规集合Vio(Σ, G)里。
+
+而我们所谓的错误检测就是输入一个GFDs集合 Σ和一个图G，会有输出一个违反集合Vio(Σ, G)。我们称这个决策问题为GFDs的验证问题，用于判断是否G |= Σ，当然只有违反集合Vio(Σ, G)为空时，G |= Σ。
+
+## 三个算法
+
+### 顺序算法
+此算法使用了一个GFDs集合Σ，一个图G，一个单处理器来计算违反集合Vio(Σ, G)。我们称这个算法为detVio
+
+​        执行如下：
+
+​		刚开始时Vio(Σ, G) = ∅。枚举G中的模式Q中的所有h(x)，检查是否存在即h(x)!=x->y是否存在，若违反了就添加到Vio(Σ, G)。
+
+​		这种算法非常简单，执行起来的时间复杂度非常非常得高，所以对于大图来说是禁止的。
+
+### 并行算法的介绍
+以上算法复杂度这么高，因此我们提出了一个用于解决此问题的并行算法，也就是复制图的并行算法和碎片图的并行算法
+
+ 首先介绍一下新的符号和概念：
+
+W(Σ, G)表示工作量，是算法计算所有违反集合Vio(Σ, G)所需要的消耗
+
+t(|Σ|,|G|)表示最好的顺序算法在计算Vio(Σ, G)所消耗的时间
+
+T(|Σ|,|G|, n)表示使用n个处理器通过并行算法来计算Vio(Σ, G)所使用的时间![](Functional Dependencies for Graphs 图函数依赖关系.assets/17.png)
+
+![](Functional Dependencies for Graphs 图函数依赖关系.assets/18.png)
+
+​			σ 是一个一对一的映射，从Z映射到G中的节点，Z就是上面介绍的轴向量；O(zi)和U(zi)是不一样的，前者表示G中的节点，后者表示Q中的节点，O(zi)是Q(zi)的候选，是对应的分享相同的标签
+
+![](Functional Dependencies for Graphs 图函数依赖关系.assets/20.png)
+
+
+
+### 复制图的并行算法
+
+命题12: 1、负载平衡问题是NP-complete的。2、给定Σ, n和W(Σ, G)，在O(n|W(Σ, G)| + |W(Σ, G)| log|W(Σ, G)|) 时间内有一个2-近似算法来寻找平衡的工作负载分区
+
+此算法先将图G复制到每一个处理器上，我们所要做的就是将工作量均匀的分配到每一个处理器上。
+
+算法名称为repVal，由一个协调器和n个处理器组成。协调器上运行了一个程序bPar，处理器上并行地运行了程序localVio，运行过程为：
+
+![](Functional Dependencies for Graphs 图函数依赖关系.assets/21.png)
+
+![](Functional Dependencies for Graphs 图函数依赖关系.assets/22.png)
+
+bPar是进行工作量均匀分配方式：
+
+![](Functional Dependencies for Graphs 图函数依赖关系.assets/23.png)
+
+localVio的工作方式：
+
+![](Functional Dependencies for Graphs 图函数依赖关系.assets/24.png)
+
+### 碎片图的算法
+
+此算法论文没有举例，以后遇到再补充对此算法的使用简介，此处只说了一些定义
+
+![](Functional Dependencies for Graphs 图函数依赖关系.assets/25.png)
+
+dispart工作方式：
+
+![](Functional Dependencies for Graphs 图函数依赖关系.assets/26.png)
+
+## 结论
+
+这项工作是迈向图依赖理论的第一步。我们提出了GFD ，为其经典问题建立了复杂性界限，并为其应用提供了并行可扩展算法。我们的实验结果证明了GFD技术的有效性。
+未来工作的主题之一是为现实图形中的GFD发现开发有效的算法。另一个问题是，提供一个健全和完整的公理系统GFDs ，沿着相同的路线作为阿姆斯特朗的公理关系的FD [3]。第三个主题是在存在常见于知识库中的类型和其他语义约束的情况下，重新研究GFD的可满足性和隐含性问题。
 
